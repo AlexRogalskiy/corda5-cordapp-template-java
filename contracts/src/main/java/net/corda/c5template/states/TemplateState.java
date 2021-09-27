@@ -1,14 +1,11 @@
 package net.corda.c5template.states;
 
-import com.google.gson.Gson;
 import net.corda.c5template.contracts.TemplateContract;
 import net.corda.v5.application.identity.AbstractParty;
 import net.corda.v5.application.identity.Party;
 import net.corda.v5.application.utilities.JsonRepresentable;
-import net.corda.v5.base.annotations.CordaSerializable;
 import net.corda.v5.ledger.contracts.BelongsToContract;
 import net.corda.v5.ledger.contracts.ContractState;
-import net.corda.v5.serialization.annotations.ConstructorForDeserialization;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -56,17 +53,5 @@ public class TemplateState implements ContractState, JsonRepresentable {
     @Override
     public String toJsonString() {
         return "msg : " + msg + " sender : " + sender.getName().toString() + " receiver : " + receiver.getName().toString();
-    }
-}
-
-class TemplateStateDto {
-    private String msg;
-    private String sender;
-    private String receiver;
-
-    public TemplateStateDto(String msg, String sender, String receiver) {
-        this.msg = msg;
-        this.sender = sender;
-        this.receiver = receiver;
     }
 }

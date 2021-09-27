@@ -14,9 +14,6 @@ cordapp {
 }
 
 dependencies {
-   // implementation "net.corda.kotlin:kotlin-stdlib-jdk8-osgi:$kotlinVersion"
-    implementation 'com.google.code.gson:gson:2.8.6'
-
     cordaProvided "net.corda:corda-persistence:$cordaAPIVersion"
     cordaProvided "net.corda:corda-application:$cordaAPIVersion"
     cordaProvided "net.corda:corda-ledger:$cordaAPIVersion"

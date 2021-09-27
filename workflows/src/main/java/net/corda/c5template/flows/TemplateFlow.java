@@ -103,7 +103,7 @@ public class TemplateFlow implements Flow<SignedTransactionDigest> {
         // Send the state to the counterparty, and receive it back with their signature.
         FlowSession receiverSession = flowMessaging.initiateFlow(receiver);
 
-            SignedTransaction fullySignedTx = flowEngine.subFlow(new CollectSignaturesFlow(partialSignedTx,
+        SignedTransaction fullySignedTx = flowEngine.subFlow(new CollectSignaturesFlow(partialSignedTx,
                     Arrays.asList(receiverSession)));
 
         // Stage 5.
