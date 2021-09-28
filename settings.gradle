@@ -3,10 +3,6 @@ pluginManagement {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
-        maven { url 'https://software.r3.com/artifactory/corda-releases' }
-        maven { url 'https://software.r3.com/artifactory/corda-os-maven' }
-        maven { url 'https://software.r3.com/artifactory/engineering-tools-maven' }
         gradlePluginPortal()
     }
 
