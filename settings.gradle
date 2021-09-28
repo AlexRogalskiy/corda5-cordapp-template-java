@@ -1,33 +1,12 @@
 pluginManagement {
-    settings.ext {
-        artifactoryUsername = find('cordaArtifactoryUsername') ?: System.getenv("CORDA_ARTIFACTORY_USERNAME")
-        artifactoryAPIKey = find('cordaArtifactoryPassword') ?: System.getenv('CORDA_ARTIFACTORY_PASSWORD')
-    }
 
     repositories {
-        maven {
-            url "$artifactoryContextUrl/corda-releases"
-        }
-        maven {
-            url = "$artifactoryContextUrl/corda-os-maven"
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = artifactoryUsername
-                password = artifactoryAPIKey
-            }
-        }
-        maven {
-            url = "$artifactoryContextUrl/engineering-tools-maven"
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = artifactoryUsername
-                password = artifactoryAPIKey
-            }
-        }
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url 'https://software.r3.com/artifactory/corda-releases' }
+        maven { url 'https://software.r3.com/artifactory/corda-os-maven' }
+        maven { url 'https://software.r3.com/artifactory/engineering-tools-maven' }
         gradlePluginPortal()
     }
 
@@ -40,19 +19,6 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-        maven {
-            url = "$artifactoryContextUrl/corda-os-maven"
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                username = artifactoryUsername
-                password = artifactoryAPIKey
-            }
-        }
-        maven {
-            url = "$artifactoryContextUrl/corda-dependencies"
-        }
         mavenLocal()
     }
 }

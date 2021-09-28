@@ -27,10 +27,10 @@ corda-cli network config docker-compose template-network
 #4 Start docker containers.
 corda-cli network deploy -n template-network -f c5cordapp-template.yaml | docker-compose -f - up
    
-This step will take roughly a mintute to complete so wait for the Corda logo to populate. 
+This will download corda/corda-dev image from the docker hub and will take roughly a mintute to complete so wait for the Corda logo to populate. 
     
 #5 Install the cpb file into the network.
-corda-cli package install -n template-network template.cpb
+corda-cli package install -n template-network result.cpb
 ```
 I had combined step 1 to 5 into an shell script called run.sh, you can simply call `sh ./run.sh` in your terminal and that will sequentially run step 1 to 5. 
 
