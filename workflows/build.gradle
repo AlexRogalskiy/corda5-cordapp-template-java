@@ -15,7 +15,6 @@ cordapp {
 
 dependencies {
     cordaProvided "net.corda:corda-application:$cordaAPIVersion"
-    cordaProvided "net.corda:corda-client-rpc:$cordaAPIVersion"
     cordaProvided "net.corda:corda-crypto-api:$cordaAPIVersion"
     cordaProvided "net.corda:corda-legacy-api:$cordaAPIVersion"
 
