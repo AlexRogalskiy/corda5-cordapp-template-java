@@ -4,9 +4,6 @@ pluginManagement {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
-        maven {
-            url = "$artifactoryContextUrl/corda-dependencies"
-        }
     }
 
     plugins {
@@ -19,9 +16,6 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         mavenLocal()
-        maven {
-            url = "$artifactoryContextUrl/corda-dependencies"
-        }
     }
 }
 
