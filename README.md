@@ -32,7 +32,6 @@ This will download corda/corda-dev image from the docker hub and will take rough
 #5 Install the cpb file into the network.
 corda-cli package install -n template-network result.cpb
 ```
-I had combined step 1 to 5 into an shell script called run.sh, you can simply call `sh ./run.sh` in your terminal and that will sequentially run step 1 to 5. 
 
 You can always look at the status of the network by the command: 
 ```
