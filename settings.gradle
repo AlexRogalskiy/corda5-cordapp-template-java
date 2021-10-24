@@ -4,6 +4,9 @@ pluginManagement {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
+        maven {
+            url "$artifactoryContextUrl/corda-dependencies"
+        }
     }
 
     plugins {
@@ -16,10 +19,13 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         mavenLocal()
+        maven {
+            url "$artifactoryContextUrl/corda-dependencies"
+        }
     }
 }
 
-rootProject.name = 'c5-cordapp-template-java'
+rootProject.name = 'c5-land-registry'
 include 'contracts'
 include 'workflows'
 

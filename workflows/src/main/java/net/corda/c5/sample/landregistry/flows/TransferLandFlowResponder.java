@@ -1,4 +1,4 @@
-package net.corda.c5template.flows;
+package net.corda.c5.sample.landregistry.flows;
 
 import net.corda.systemflows.ReceiveFinalityFlow;
 import net.corda.systemflows.SignTransactionFlow;
@@ -12,21 +12,28 @@ import net.corda.v5.base.annotations.Suspendable;
 import net.corda.v5.ledger.transactions.SignedTransaction;
 import org.jetbrains.annotations.NotNull;
 
-@InitiatedBy(TemplateFlow.class)
-public class TemplateFlowResponder implements Flow<SignedTransaction> {
+@InitiatedBy(TransferLandFlow.class)
+public class TransferLandFlowResponder implements Flow<SignedTransaction> {
+
     @CordaInject
     private FlowEngine flowEngine;
+
     private FlowSession counterpartySession;
-    public TemplateFlowResponder(FlowSession counterpartySession) {
+
+    public TransferLandFlowResponder(FlowSession counterpartySession) {
         this.counterpartySession = counterpartySession;
     }
+
     @Suspendable
     @Override
     public SignedTransaction call() throws FlowException {
-        SignedTransaction signedTransaction = flowEngine.subFlow(new MySignTransactionFlow(counterpartySession));
+        SignedTransaction signedTransaction =
+                flowEngine.subFlow(new MySignTransactionFlow(counterpartySession));
 
-        return flowEngine.subFlow(new ReceiveFinalityFlow(counterpartySession, signedTransaction.getId()));
+        return flowEngine.subFlow(
+                new ReceiveFinalityFlow(counterpartySession, signedTransaction.getId()));
     }
+
     public static class MySignTransactionFlow extends SignTransactionFlow {
         MySignTransactionFlow(FlowSession counterpartySession) {
             super(counterpartySession);
@@ -35,4 +42,5 @@ public class TemplateFlowResponder implements Flow<SignedTransaction> {
         protected void checkTransaction(@NotNull SignedTransaction stx) {
         }
     }
+
 }

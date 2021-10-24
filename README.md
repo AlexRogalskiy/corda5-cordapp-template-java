@@ -9,11 +9,15 @@
 Step 2 - 4 To find detailed instructions visit the docs site [here](https://docs.r3.com/en/platform/corda/5.0-dev-preview-1.html)
 
 ## App Functionalities 
-This app is a skeleton corda 5 cordapp. The app has a TemplateState, a TemplateStateContract, and a TemplateFlow. The flow will send a p2p transaction that carries the TemplateState to the target party. The TemplateState always carries a Hello-World String. 
+This sample app is a demonstration of how to do a simple Issue and Move transaction in Corda 5, with the help of a 
+land registry use case. It has two simple functionality:
+ - Issuer can issue land to particular party.
+ - The current owner of the land can transfer the land to another party.
 
-## How to run the template
+## How to run the sample
 
-Corda 5 re-engineering the test development experience, utilizing the dockers for test deployment. we need to follow a couple of steps to test deploy the app. 
+With Corda 5 test development experience has been re-engineered, it utilizes docker for test deployment. 
+We need to follow a couple of steps to test deploy the sample app. 
 ```
 #1 Build the projects.
 ./gradlew clean build
@@ -22,36 +26,33 @@ Corda 5 re-engineering the test development experience, utilizing the dockers fo
 cordapp-builder create --cpk workflows/build/libs/workflows-1.0.0-DevPreview-cordapp.cpk --cpk contracts/build/libs/contracts-1.0.0-DevPreview-cordapp.cpk -o result.cpb 
 
 #3 Configure the mock network
-corda-cli network config docker-compose template-network
+corda-cli network config docker-compose demo-network
 
 #4 Start docker containers.
-corda-cli network deploy -n template-network -f c5cordapp-template.yaml | docker-compose -f - up
+corda-cli network deploy -n demo-network -f node-config.yaml | docker-compose -f - up
    
 This will download corda/corda-dev image from the docker hub and will take roughly a mintute to complete so wait for the Corda logo to populate. 
     
 #5 Install the cpb file into the network.
-corda-cli package install -n template-network result.cpb
+corda-cli package install -n demo-network result.cpb
 ```
-I had combined step 1 to 5 into an shell script called run.sh, you can simply call `sh ./run.sh` in your terminal and that will sequentially run step 1 to 5. 
+If all the command are run properly, our sample app should be successfully deployed and running on the test network at this point. 
 
-You can always look at the status of the network by the command: 
+## Check network status
+We can always look at the status of the test network using the command: 
 ```
-corda-cli network status -n template-network
+corda-cli network status -n demo-network
 ```
-You can shut down the test network by the command: 
-```
-corda-cli network terminate -n template-network -ry
-```
-Thus far, your app is successfully running on a corda 5 test deployment network. 
 
 ## Interact with the app 
 Open a browser and go to `https://localhost:<port>/api/v1/swagger`
 
-For this app, the ports are: 
+For this sample app, the ports are: 
 * PartyA's node: 12112
 * PartyB's node: 12116
+* PartyB's node: 12120
 
-NOTE: This information is in the status printout of the network. Use the status command that documented above. 
+**NOTE: This information is in the status printout of the network. Use the status command that documented above.**
 
 The url will bring you to the swagger API interface, it is a set of HTTP API which you can use out of the box. In order to continue interacting with your app, you would need to log in now. 
 
@@ -59,8 +60,9 @@ Depends on the node that you chose to go to, you would need to log into the node
 For this app, the logins are: 
 * PartyA - Login: angelenos, password: password
 * PartyB - Login: londoner, password: password
+* PartyC - Login: mumbaikar, password: password
 
-NOTE: This information is in the c5cordapp-template.yaml file. 
+**NOTE: This information is in the node-config.yaml file.** 
 
 Lets test if you have successfully logged in by go to the RegistedFlows 
 ![img.png](registeredflows.png)
@@ -68,7 +70,7 @@ Lets test if you have successfully logged in by go to the RegistedFlows
 You should expect a 200 success callback code, and a response body of such: 
 ```
 [
-  "net.corda.c5template.flows.TemplateFlow"
+  "TemplateFlow"
 ]
 ```
 
@@ -78,7 +80,7 @@ in the request body put in:
 {
   "rpcStartFlowRequest": {
     "clientId": "launchpad-2", 
-    "flowName": "net.corda.c5template.flows.TemplateFlow", 
+    "flowName": "TemplateFlow", 
     "parameters": { 
       "parametersInJson": "{\"msg\": \"Hello-World\", \"receiver\": \"C=GB, L=London, O=PartyB, OU=INC\"}" 
     } 
@@ -115,3 +117,9 @@ We will getting the following response:
 The completed status of the flow means the success of the flow and its carried transaction. 
 
 Thus far, we had completed a full cycle of running a flow. 
+
+## Shutting down the test network
+Finally, we can shut down the test network by using the command:
+```
+corda-cli network terminate -n demo-network -ry
+```

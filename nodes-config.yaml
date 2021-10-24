@@ -17,5 +17,14 @@ nodes:
       londoner:
         password: password
         permissions: [ "ALL" ]
+  PartyC:
+    debug: true
+    x500: "C=IN, L=Mumbai, O=PartyC, OU=INC"
+    users:
+      user1:
+        password: test
+      mumbaikar:
+        password: password
+        permissions: [ "ALL" ]
   notary:
     notary: true
