@@ -10,15 +10,15 @@ import net.corda.v5.application.injection.CordaInject;
 import net.corda.v5.base.annotations.Suspendable;
 import net.corda.v5.ledger.transactions.SignedTransaction;
 
-@InitiatedBy(IssueLandFlow.class)
-public class IssueLandFlowResponder implements Flow<SignedTransaction> {
+@InitiatedBy(IssueLandTitleFlow.class)
+public class IssueLandTitleFlowResponder implements Flow<SignedTransaction> {
 
     @CordaInject
     private FlowEngine flowEngine;
 
     private FlowSession counterpartySession;
 
-    public IssueLandFlowResponder(FlowSession counterpartySession) {
+    public IssueLandTitleFlowResponder(FlowSession counterpartySession) {
         this.counterpartySession = counterpartySession;
     }
 

@@ -12,15 +12,15 @@ import net.corda.v5.base.annotations.Suspendable;
 import net.corda.v5.ledger.transactions.SignedTransaction;
 import org.jetbrains.annotations.NotNull;
 
-@InitiatedBy(TransferLandFlow.class)
-public class TransferLandFlowResponder implements Flow<SignedTransaction> {
+@InitiatedBy(TransferLandTitleFlow.class)
+public class TransferLandTitleFlowResponder implements Flow<SignedTransaction> {
 
     @CordaInject
     private FlowEngine flowEngine;
 
     private FlowSession counterpartySession;
 
-    public TransferLandFlowResponder(FlowSession counterpartySession) {
+    public TransferLandTitleFlowResponder(FlowSession counterpartySession) {
         this.counterpartySession = counterpartySession;
     }
 

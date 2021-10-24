@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 // ************
 // * Contract *
 // ************
-public class LandContract implements Contract {
+public class LandTitleContract implements Contract {
     // This is used to identify our contract when building a transaction.
     public static final String ID = "net.corda.c5.sample.landregistry.LandContract";
 

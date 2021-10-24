@@ -1,6 +1,6 @@
 package net.corda.c5.sample.landregistry.states;
 
-import net.corda.c5.sample.landregistry.contracts.LandContract;
+import net.corda.c5.sample.landregistry.contracts.LandTitleContract;
 import net.corda.v5.application.identity.AbstractParty;
 import net.corda.v5.application.identity.Party;
 import net.corda.v5.application.utilities.JsonRepresentable;
@@ -14,8 +14,8 @@ import java.util.List;
 // *********
 // * State *
 // *********
-@BelongsToContract(LandContract.class)
-public class LandState implements ContractState, JsonRepresentable {
+@BelongsToContract(LandTitleContract.class)
+public class LandTitleState implements ContractState, JsonRepresentable {
 
     /* This is the unique identifier of the property */
     private String plotNumber;
@@ -27,7 +27,7 @@ public class LandState implements ContractState, JsonRepresentable {
 
     /* Constructor of our Corda state */
 
-    public LandState(String plotNumber, String dimensions, String area, Party owner, Party issuer) {
+    public LandTitleState(String plotNumber, String dimensions, String area, Party owner, Party issuer) {
         this.plotNumber = plotNumber;
         this.dimensions = dimensions;
         this.area = area;

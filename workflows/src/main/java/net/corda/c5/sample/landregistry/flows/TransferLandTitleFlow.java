@@ -1,7 +1,7 @@
 package net.corda.c5.sample.landregistry.flows;
 
-import net.corda.c5.sample.landregistry.contracts.LandContract;
-import net.corda.c5.sample.landregistry.states.LandState;
+import net.corda.c5.sample.landregistry.contracts.LandTitleContract;
+import net.corda.c5.sample.landregistry.states.LandTitleState;
 import net.corda.systemflows.CollectSignaturesFlow;
 import net.corda.systemflows.FinalityFlow;
 import net.corda.v5.application.flows.*;
@@ -30,11 +30,11 @@ import java.util.*;
 
 @InitiatingFlow
 @StartableByRPC
-public class TransferLandFlow implements Flow<SignedTransactionDigest> {
+public class TransferLandTitleFlow implements Flow<SignedTransactionDigest> {
     private RpcStartFlowRequestParameters params;
 
     @JsonConstructor
-    public TransferLandFlow(RpcStartFlowRequestParameters params) {
+    public TransferLandTitleFlow(RpcStartFlowRequestParameters params) {
         this.params = params;
     }
 
@@ -82,33 +82,33 @@ public class TransferLandFlow implements Flow<SignedTransactionDigest> {
         //Query the landState
         Map <String, Object> namedParameters = new LinkedHashMap<>();
         namedParameters.put("stateStatus", StateStatus.UNCONSUMED);
-        Cursor<StateAndRef<LandState>> cursor = persistenceService.query(
+        Cursor<StateAndRef<LandTitleState>> cursor = persistenceService.query(
                 "VaultState.findByStateStatus",
                 namedParameters,
                 new SetBasedVaultQueryFilter.Builder()
-                        .withContractStateClassNames(Set.of(LandState.class.getName()))
+                        .withContractStateClassNames(Set.of(LandTitleState.class.getName()))
                         .build(),
                 "Corda.IdentityStateAndRefPostProcessor"
         );
 
-        List<StateAndRef<LandState>> inputLandStateStateAndRefList =
+        List<StateAndRef<LandTitleState>> inputLandStateStateAndRefList =
                 cursor.poll(100, Duration.ofSeconds(20)).getValues();
 
-        StateAndRef<LandState> inputLandStateStateAndRef =
+        StateAndRef<LandTitleState> inputLandStateStateAndRef =
                 inputLandStateStateAndRefList.stream().filter(stateAndRef -> {
-            LandState landState = stateAndRef.getState().getData();
-            return landState.getPlotNumber().equals(plotNumber);
+            LandTitleState landTitleState = stateAndRef.getState().getData();
+            return landTitleState.getPlotNumber().equals(plotNumber);
         }).findAny().orElseThrow(() -> new FlowException("Land Not Found"));
 
-        LandState outputLandState = getOutputState(inputLandStateStateAndRef, owner);
+        LandTitleState outputLandTitleState = getOutputState(inputLandStateStateAndRef, owner);
 
         // Build the transaction.
         TransactionBuilder transactionBuilder = transactionBuilderFactory.create()
                 .setNotary(inputLandStateStateAndRef.getState().getNotary())
                 .addInputState(inputLandStateStateAndRef)
-                .addOutputState(outputLandState)
-                .addCommand(new LandContract.Commands.Transfer(),
-                        Arrays.asList(outputLandState.getOwner().getOwningKey(),
+                .addOutputState(outputLandTitleState)
+                .addCommand(new LandTitleContract.Commands.Transfer(),
+                        Arrays.asList(outputLandTitleState.getOwner().getOwningKey(),
                                 inputLandStateStateAndRef.getState().getData().getIssuer().getOwningKey(),
                                 inputLandStateStateAndRef.getState().getData().getOwner().getOwningKey()));
 
@@ -119,7 +119,7 @@ public class TransferLandFlow implements Flow<SignedTransactionDigest> {
         SignedTransaction selfSignedTx = transactionBuilder.sign();
 
         // Send the state to the counterparty, and receive their signature.
-        FlowSession ownerSession = flowMessaging.initiateFlow(outputLandState.getOwner());
+        FlowSession ownerSession = flowMessaging.initiateFlow(outputLandTitleState.getOwner());
         FlowSession issuerSession = flowMessaging.initiateFlow(inputLandStateStateAndRef.getState().getData().getIssuer());
         SignedTransaction fullySignedTx = flowEngine.subFlow(new CollectSignaturesFlow(selfSignedTx,
                 Arrays.asList(ownerSession, issuerSession)));
@@ -134,11 +134,11 @@ public class TransferLandFlow implements Flow<SignedTransactionDigest> {
                 notarisedTx.getSigs());
     }
 
-    private LandState getOutputState(StateAndRef<LandState> inputStateAndRef, Party owner){
-        LandState inputState = inputStateAndRef.getState().getData();
-        LandState landState = new LandState(inputState.getPlotNumber(), inputState.getDimensions(),
+    private LandTitleState getOutputState(StateAndRef<LandTitleState> inputStateAndRef, Party owner){
+        LandTitleState inputState = inputStateAndRef.getState().getData();
+        LandTitleState landTitleState = new LandTitleState(inputState.getPlotNumber(), inputState.getDimensions(),
                 inputState.getArea(), owner, inputState.getIssuer());
-        return landState;
+        return landTitleState;
     }
 }
 

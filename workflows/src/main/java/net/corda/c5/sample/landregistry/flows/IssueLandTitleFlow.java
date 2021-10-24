@@ -1,7 +1,7 @@
 package net.corda.c5.sample.landregistry.flows;
 
-import net.corda.c5.sample.landregistry.contracts.LandContract;
-import net.corda.c5.sample.landregistry.states.LandState;
+import net.corda.c5.sample.landregistry.contracts.LandTitleContract;
+import net.corda.c5.sample.landregistry.states.LandTitleState;
 import net.corda.systemflows.FinalityFlow;
 import net.corda.v5.application.flows.*;
 import net.corda.v5.application.flows.flowservices.FlowEngine;
@@ -25,11 +25,11 @@ import java.util.Map;
 
 @InitiatingFlow
 @StartableByRPC
-public class IssueLandFlow implements Flow<SignedTransactionDigest> {
+public class IssueLandTitleFlow implements Flow<SignedTransactionDigest> {
     private RpcStartFlowRequestParameters params;
 
     @JsonConstructor
-    public IssueLandFlow(RpcStartFlowRequestParameters params) {
+    public IssueLandTitleFlow(RpcStartFlowRequestParameters params) {
         this.params = params;
     }
 
@@ -61,13 +61,13 @@ public class IssueLandFlow implements Flow<SignedTransactionDigest> {
         Party notary = notaryLookupService.getNotaryIdentities().get(0);
 
         // Build the output state from the parameters passed to the flow
-        LandState landState = getOutputState();
+        LandTitleState landTitleState = getOutputState();
 
         // Build the transaction.
         TransactionBuilder transactionBuilder = transactionBuilderFactory.create()
                 .setNotary(notary)
-                .addOutputState(landState)
-                .addCommand(new LandContract.Commands.Issue(), Arrays.asList(landState.getIssuer().getOwningKey()));
+                .addOutputState(landTitleState)
+                .addCommand(new LandTitleContract.Commands.Issue(), Arrays.asList(landTitleState.getIssuer().getOwningKey()));
 
         // Verify that the transaction is valid.
         transactionBuilder.verify();
@@ -77,10 +77,10 @@ public class IssueLandFlow implements Flow<SignedTransactionDigest> {
 
         // Notarise and record the transaction in both parties' vaults
         SignedTransaction notarisedTx;
-        if(landState.getOwner().equals(landState.getIssuer())){ // Self Issue
+        if(landTitleState.getOwner().equals(landTitleState.getIssuer())){ // Self Issue
             notarisedTx = flowEngine.subFlow(new FinalityFlow(signedTx, Collections.emptyList()));
         }else {
-            FlowSession receiverSession = flowMessaging.initiateFlow(landState.getOwner());
+            FlowSession receiverSession = flowMessaging.initiateFlow(landTitleState.getOwner());
             notarisedTx = flowEngine.subFlow(new FinalityFlow(signedTx, Arrays.asList(receiverSession)));
         }
 
@@ -90,7 +90,7 @@ public class IssueLandFlow implements Flow<SignedTransactionDigest> {
                 notarisedTx.getSigs());
     }
 
-    private LandState getOutputState(){
+    private LandTitleState getOutputState(){
         Map<String, String> parametersMap = jsonMarshallingService.parseJson(params.getParametersInJson(), Map.class);
         checkParams(parametersMap);
 
@@ -100,8 +100,8 @@ public class IssueLandFlow implements Flow<SignedTransactionDigest> {
         String dimensions = parametersMap.get("dimensions");
         String area = parametersMap.get("area");
 
-        LandState landState = new LandState(plotNumber, dimensions, area, owner, issuer);
-        return landState;
+        LandTitleState landTitleState = new LandTitleState(plotNumber, dimensions, area, owner, issuer);
+        return landTitleState;
     }
 
     private void checkParams(Map<String, String> parametersMap){
