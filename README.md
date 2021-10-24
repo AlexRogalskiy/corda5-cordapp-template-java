@@ -1,4 +1,4 @@
-# Corda5 Cordapp Template 
+# Corda5 Land Registry to Demo Simple Issue/ Move
 
 ## Environment Requirements: 
 1. Download and install Java 11
@@ -54,69 +54,127 @@ For this sample app, the ports are:
 
 **NOTE: This information is in the status printout of the network. Use the status command that documented above.**
 
-The url will bring you to the swagger API interface, it is a set of HTTP API which you can use out of the box. In order to continue interacting with your app, you would need to log in now. 
+The url will bring us to the swagger API interface, it is a set of HTTP API which we can use out of the box. 
+In order to continue interacting with our app, we would need to log in. 
 
-Depends on the node that you chose to go to, you would need to log into the node use the correct credentials. 
-For this app, the logins are: 
+Depending on the node that we chose, we would need to log into the node using the correct credentials. 
+For this sample app, the credentials are: 
 * PartyA - Login: angelenos, password: password
 * PartyB - Login: londoner, password: password
 * PartyC - Login: mumbaikar, password: password
 
-**NOTE: This information is in the node-config.yaml file.** 
+**NOTE: This information can be found in the node-config.yaml file.** 
 
-Lets test if you have successfully logged in by go to the RegistedFlows 
-![img.png](registeredflows.png)
+### Run Issue Land Flow
 
-You should expect a 200 success callback code, and a response body of such: 
-```
-[
-  "TemplateFlow"
-]
-```
+We can run any flow registered on the node using the `/flowstarter/startflow` API. This request carries three pieces of information:
+1. The clientID of this call
+2. The flow we are triggering
+3. The flow parameters that we are providing.
 
-Now, let's look at the `startflow` API, we will test our tempalteFlow with it. 
-in the request body put in: 
+To run the `IssueLandFlow`, we can log in to PartyA and run the `/flowstarter/startflow` API using the below request body.
 ```
 {
   "rpcStartFlowRequest": {
-    "clientId": "launchpad-2", 
-    "flowName": "TemplateFlow", 
-    "parameters": { 
-      "parametersInJson": "{\"msg\": \"Hello-World\", \"receiver\": \"C=GB, L=London, O=PartyB, OU=INC\"}" 
-    } 
-  } 
+    "clientId": "Client1",
+    "flowName": "net.corda.c5.sample.landregistry.flows.IssueLandFlow",
+    "parameters": {
+      "parametersInJson": "{\"plotNumber\":\"PT01\",\"dimensions\":\"60x60\",\"area\":\"1800sqft\",\"owner\":\"C=GB, L=London, O=PartyB, OU=INC\"}"
+    }
+  }
 }
 ```
-This request carries three pieces of information: 
-1. The clientID of this call 
-2. The flow we are triggering 
-3. The flow parameters that we are providing. 
 
-After the call, you shuold expect a 200 success call code, and a response body as such: 
+After the call, you should expect a 200 success call code, and a response body as such: 
 ```
 {
   "flowId": {
     "uuid": "81e1415e-be7c-4038-8d06-8e76bdfd8bc7"
   },
-  "clientId": "launchpad-2"
+  "clientId": "Client1"
 }
 ```
-NOTE: This does not mean the transaction is passed through, it means the flow is successfully executed, but the success of the transaction is not guaranteed. 
+**NOTE: This does not mean the transaction is passed through, it means the flow is successfully executed, but the success of the transaction is not guaranteed.** 
 
-You would need either go to `flowoutcomeforclientid` or `flowoutcome` to see the result of the flow. In this case, we will use the clientID to query the flow result: 
+We would need either go to `/flowstarter/flowoutcomeforclientid/{clientid}` or `/flowstarter/flowoutcome/{flowid}` to see the result of the flow. 
+In this case, we will use the `flowId` to query the flow result: 
 
-Enter the clientID of our previous flow call: `launchpad-2`
+Enter the flowId of our previous flow call: `81e1415e-be7c-4038-8d06-8e76bdfd8bc7`
 We will getting the following response: 
 ```
 {
-    "status": "COMPLETED",
-    "resultJson": "{ \n \"txId\" : \"SHA-256:F0590184B3E026BE79A10857DCC8EBD3482B0D0AE00DA2DC79FA685CF4F0B62F\",\n \"outputStates\" : [\"msg : Hello-World sender : OU=LLC, O=PartyA, L=Los Angeles, C=US receiver : OU=INC, O=PartyB, L=London, C=GB\"], \n \"signatures\": [\"tDTdbtbn/rkUhBLom9lDOikiWspTfQSpsKFC7A5g8N/Bn3kXgA4AYV0BixAgUHy+8chOzXIkxOUo6eVgG/T1Cg==\", \"jEyhgHdfqy5Mo62bFZG6X+4uZ7+6FzkdzzfzczMGxTaER5QROZgEklC2E2jf6SVRsYw+NLHGwfd/K+ESr0sHBw==\"]\n}",
-    "exceptionDigest": null
+  "status": "COMPLETED",
+  "resultJson": "{ \n \"txId\" : \"SHA-256:CCF78722E7500302698192FED6CECE44F03D1AE95EE986F9E0F00AFB3D694537\",\n \"outputStates\" : [\"plotNumber: PT01 location: null dimensions: 60x60 area: 1800sqft owner: OU=INC, O=PartyB, L=London, C=GB issuer: OU=LLC, O=PartyA, L=Los Angeles, C=US\"], \n \"signatures\": [\"w9gaee2r09vmq0yo1Be3bFAT6LxiGenlVUizJtpura5LI83uiTKWPBZ3sDW+TzKrVMP2p9BoqUUVdbKnQXPKAw==\"]\n}",
+  "exceptionDigest": null
 }
 ```
 The completed status of the flow means the success of the flow and its carried transaction. 
 
-Thus far, we had completed a full cycle of running a flow. 
+## Querying the state
+Corda 5 introduces a new Query API that is exposed as part of the HTTP-RPC Persistence API. It allows us to invoke 
+named-queries via HTTP requests and receive results marshalled to JSON. To learn more refer to our [documentation](https://docs.r3.com/en/platform/corda/5.0-dev-preview-1/cordapps/persistence/http-named-query-api.html)
+
+To perform a query we can use the `/persistence/query` API using the below request body:
+
+```
+{
+  "request": {
+    "namedParameters": {
+      "stateStatus": {
+        "parametersInJson": "\"UNCONSUMED\""
+      },
+      "contractStateClassName": {
+        "parametersInJson": "\"net.corda.c5.sample.landregistry.states.LandState\""
+      }
+    },
+    "queryName": "VaultState.findByStateStatusAndContractStateClassName",
+    "postProcessorName": "Corda.IdentityContractStatePostProcessor"
+  },
+  "context": {
+    "awaitForResultTimeout": "PT15M",
+    "currentPosition": -1,
+    "maxCount": 10
+  }
+}
+```
+
+It should produce a response as below showing the `LandState` that is recorded on the ledger:
+
+```
+{
+  "positionedValues": [
+    {
+      "value": {
+        "json": "plotNumber: PT01  dimensions: 60x60 area: 1800sqft owner: OU=INC, O=PartyB, L=London, C=GB issuer: OU=LLC, O=PartyA, L=Los Angeles, C=US"
+      },
+      "position": 0
+    }
+  ],
+  "remainingElementsCountEstimate": null
+}
+```
+
+We could also verify the same at PartyB, by logging into PartyB's Swagger UI and running the `/persistence/query` API.
+
+## Run Transfer Land Flow
+
+Once the land has been issued to PartyB, he can transfer it to PartyC, using the `TransferLandFlow` flow. 
+It should be pretty straightforward, login to PartyB's Swagger UI and run the flow using the `/flowstarter/startflow` API.
+
+The request body needed would be:
+```
+{
+  "rpcStartFlowRequest": {
+    "clientId": "c002",
+    "flowName": "net.corda.c5.sample.landregistry.flows.TransferLandFlow",
+    "parameters": {
+      "parametersInJson": "{\"plotNumber\":\"PT01\",\"owner\":\"C=IN, L=Mumbai, O=PartyC, OU=INC\"}"
+    }
+  }
+}
+```
+
+If run successfully this should transfer the land from PartyB to PartyC, which we can again verify using the `/persistence/query` API.
 
 ## Shutting down the test network
 Finally, we can shut down the test network by using the command:
