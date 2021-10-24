@@ -91,7 +91,6 @@ public class TransferLandFlow implements Flow<SignedTransactionDigest> {
                 "Corda.IdentityStateAndRefPostProcessor"
         );
 
-        // TODO - Filter by plotNumber
         List<StateAndRef<LandState>> inputLandStateStateAndRefList =
                 cursor.poll(100, Duration.ofSeconds(20)).getValues();
 
