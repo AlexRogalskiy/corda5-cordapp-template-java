@@ -1,4 +1,4 @@
-package net.corda.c5template.service;
+package net.corda.c5template.flows;
 import net.corda.v5.application.injection.CordaFlowInjectable;
 import net.corda.v5.application.services.CordaService;
 

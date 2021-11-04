@@ -8,6 +8,7 @@ pluginManagement {
 
     plugins {
         id 'net.corda.plugins.cordapp-cpk' version gradlePluginsVersion
+        id 'net.corda.plugins.cordapp-cpb' version gradlePluginsVersion
         id 'net.corda.cordapp.cordapp-configuration' version cordaAPIVersion
     }
 }
