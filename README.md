@@ -19,7 +19,7 @@ Corda 5 re-engineering the test development experience, utilizing the dockers fo
 ./gradlew clean build
 
 #2 Create the cpb file from the compiled cpk files in both contracts and workflows.
-cordapp-builder create --cpk workflows/build/libs/workflows-1.0.0-DevPreview-cordapp.cpk --cpk contracts/build/libs/contracts-1.0.0-DevPreview-cordapp.cpk -o result.cpb 
+./gradlew cpb
 
 #3 Configure the mock network
 corda-cli network config docker-compose template-network

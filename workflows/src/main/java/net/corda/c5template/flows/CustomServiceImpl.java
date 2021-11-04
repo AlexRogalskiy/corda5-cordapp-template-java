@@ -1,4 +1,4 @@
-package net.corda.c5template.service;
+package net.corda.c5template.flows;
 
 class CustomServiceImpl implements CustomService {
     public CustomServiceImpl(){
