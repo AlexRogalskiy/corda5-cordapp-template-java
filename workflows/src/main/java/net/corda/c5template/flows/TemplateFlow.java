@@ -57,10 +57,14 @@ public class TemplateFlow implements Flow<SignedTransactionDigest> {
     @CordaInject
     private JsonMarshallingService jsonMarshallingService;
 
+//    @CordaInject
+//    private CustomService customService;
+
     @Override
     @Suspendable
     public SignedTransactionDigest call() {
 
+//        customService.fun();
         Party notary = notaryLookupService.getNotaryIdentities().get(0);
 
         Map<String, String> parametersMap = jsonMarshallingService.parseJson(params.getParametersInJson(), Map.class);
