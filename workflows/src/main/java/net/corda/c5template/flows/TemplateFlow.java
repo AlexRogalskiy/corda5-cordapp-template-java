@@ -116,6 +116,18 @@ public class TemplateFlow implements Flow<SignedTransactionDigest> {
                 Collections.singletonList(jsonMarshallingService.formatJson(notarisedTx.getTx().getOutputStates().get(0))),
                 notarisedTx.getSigs());
     }
+
+    public FlowEngine getFlowEngine() {
+        return flowEngine;
+    }
+
+    public IdentityService getIdentityService() {
+        return identityService;
+    }
+
+    public JsonMarshallingService getJsonMarshallingService() {
+        return jsonMarshallingService;
+    }
 }
 
 

@@ -1,9 +1,11 @@
 package net.corda.c5template.states;
 
+import com.google.gson.Gson;
 import net.corda.c5template.contracts.TemplateContract;
 import net.corda.v5.application.identity.AbstractParty;
 import net.corda.v5.application.identity.Party;
 import net.corda.v5.application.utilities.JsonRepresentable;
+import net.corda.v5.base.annotations.CordaSerializable;
 import net.corda.v5.ledger.contracts.BelongsToContract;
 import net.corda.v5.ledger.contracts.ContractState;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +16,7 @@ import java.util.List;
 // *********
 // * State *
 // *********
+@CordaSerializable
 @BelongsToContract(TemplateContract.class)
 public class TemplateState implements ContractState, JsonRepresentable {
 
@@ -49,9 +52,58 @@ public class TemplateState implements ContractState, JsonRepresentable {
         return Arrays.asList(sender, receiver);
     }
 
+    private TemplateStateDtoJava toDto() {
+        return new TemplateStateDtoJava(
+                msg,
+                sender.getName().toString(),
+                receiver.getName().toString()
+        );
+    }
+
     @NotNull
     @Override
     public String toJsonString() {
-        return "msg : " + msg + " sender : " + sender.getName().toString() + " receiver : " + receiver.getName().toString();
+        return new Gson().toJson(this.toDto());
     }
+
+    static class TemplateStateDtoJava {
+        private String msg;
+        private String sender;
+        private String receiver;
+
+        public TemplateStateDtoJava() {
+        }
+
+        public TemplateStateDtoJava(String msg, String sender, String receiver) {
+            this.msg = msg;
+            this.sender = sender;
+            this.receiver = receiver;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public String getSender() {
+            return sender;
+        }
+
+        public String getReceiver() {
+            return receiver;
+        }
+
+        public void setMsg(String msg) {
+            this.msg = msg;
+        }
+
+        public void setSender(String sender) {
+            this.sender = sender;
+        }
+
+        public void setReceiver(String receiver) {
+            this.receiver = receiver;
+        }
+    }
+
+
 }
