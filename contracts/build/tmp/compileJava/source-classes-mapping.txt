@@ -1,7 +1,0 @@
-net/corda/c5template/contracts/TemplateContract.java
- net.corda.c5template.contracts.TemplateContract
- net.corda.c5template.contracts.TemplateContract$Commands
- net.corda.c5template.contracts.TemplateContract$Commands$Send
-net/corda/c5template/states/TemplateState.java
- net.corda.c5template.states.TemplateState
- net.corda.c5template.states.TemplateState$TemplateStateDtoJava

@@ -1,5 +1,0 @@
-net/corda/c5template/flows/TemplateFlow.java
- net.corda.c5template.flows.TemplateFlow
-net/corda/c5template/flows/TemplateFlowResponder.java
- net.corda.c5template.flows.TemplateFlowResponder
- net.corda.c5template.flows.TemplateFlowResponder$MySignTransactionFlow
