@@ -68,18 +68,18 @@ public class TemplateFlowUnitTest{
             Mockito.verify(flowMockHelper.getTransactionBuilderMock()).setNotary(flowMockHelper.getNotary());
 
             // verify the correct output state is created
-            ArgumentCaptor<TemplateState> probeStateArgCaptor = ArgumentCaptor.forClass(TemplateState.class);
-            Mockito.verify(flowMockHelper.getTransactionBuilderMock()).addOutputState(probeStateArgCaptor.capture(), Mockito.eq(TemplateContract.ID));
-            Assertions.assertThat(probeStateArgCaptor.getValue().getSender()).isEqualTo(flowMockHelper.getOurIdentity());
-            Assertions.assertThat(probeStateArgCaptor.getValue().getReceiver()).isEqualTo(flowMockHelper.getOtherSide());
-            Assertions.assertThat(probeStateArgCaptor.getValue().getMsg()).isEqualTo("Hello-World");
+            ArgumentCaptor<TemplateState> tempStateArgCaptor = ArgumentCaptor.forClass(TemplateState.class);
+            Mockito.verify(flowMockHelper.getTransactionBuilderMock()).addOutputState(tempStateArgCaptor.capture(), Mockito.eq(TemplateContract.ID));
+            Assertions.assertThat(tempStateArgCaptor.getValue().getSender()).isEqualTo(flowMockHelper.getOurIdentity());
+            Assertions.assertThat(tempStateArgCaptor.getValue().getReceiver()).isEqualTo(flowMockHelper.getOtherSide());
+            Assertions.assertThat(tempStateArgCaptor.getValue().getMsg()).isEqualTo("Hello-World");
 
             // verify command is added
-//            ArgumentCaptor<Command<CommandData>> commandArgumentCaptor = ArgumentCaptor.forClass(Command.class);
-//            Mockito.verify(flowMockHelper.getTransactionBuilderMock()).addCommand(commandArgumentCaptor.capture());
-//            Assertions.assertThat(commandArgumentCaptor.getValue().getValue()).isInstanceOf(ProbeContractJava.Commands.Launch.class);
-//            Assertions.assertThat(commandArgumentCaptor.getValue().getSigners()).contains(flowMockHelper.getOurIdentity().getOwningKey());
-//            Assertions.assertThat(commandArgumentCaptor.getValue().getSigners()).contains(flowMockHelper.getOtherSide().getOwningKey());
+            ArgumentCaptor<Command<CommandData>> commandArgumentCaptor = ArgumentCaptor.forClass(Command.class);
+            Mockito.verify(flowMockHelper.getTransactionBuilderMock()).addCommand(commandArgumentCaptor.capture());
+            Assertions.assertThat(commandArgumentCaptor.getValue().getValue()).isInstanceOf(TemplateContract.Commands.Send.class);
+            Assertions.assertThat(commandArgumentCaptor.getValue().getSigners()).contains(flowMockHelper.getOurIdentity().getOwningKey());
+            Assertions.assertThat(commandArgumentCaptor.getValue().getSigners()).contains(flowMockHelper.getOtherSide().getOwningKey());
         });
     }
 }

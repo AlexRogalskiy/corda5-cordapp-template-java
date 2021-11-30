@@ -10,12 +10,14 @@ import net.corda.v5.application.flows.*;
 import net.corda.v5.application.flows.flowservices.FlowEngine;
 import net.corda.v5.application.flows.flowservices.FlowIdentity;
 import net.corda.v5.application.flows.flowservices.FlowMessaging;
+import net.corda.v5.application.identity.AbstractParty;
 import net.corda.v5.application.identity.CordaX500Name;
 import net.corda.v5.application.identity.Party;
 import net.corda.v5.application.injection.CordaInject;
 import net.corda.v5.application.services.IdentityService;
 import net.corda.v5.application.services.json.JsonMarshallingService;
 import net.corda.v5.base.annotations.Suspendable;
+import net.corda.v5.ledger.contracts.Command;
 import net.corda.v5.ledger.services.NotaryLookupService;
 import net.corda.v5.ledger.transactions.SignedTransaction;
 import net.corda.v5.ledger.transactions.SignedTransactionDigest;
@@ -25,16 +27,13 @@ import net.corda.v5.ledger.transactions.TransactionBuilderFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @InitiatingFlow
 @StartableByRPC
 public class TemplateFlow implements Flow<SignedTransactionDigest> {
-    private RpcStartFlowRequestParameters params;
 
-    @JsonConstructor
-    public TemplateFlow(RpcStartFlowRequestParameters params) {
-        this.params = params;
-    }
+    private RpcStartFlowRequestParameters params;
 
     @CordaInject
     private FlowEngine flowEngine;
@@ -57,18 +56,21 @@ public class TemplateFlow implements Flow<SignedTransactionDigest> {
     @CordaInject
     private JsonMarshallingService jsonMarshallingService;
 
+    @JsonConstructor
+    public TemplateFlow(RpcStartFlowRequestParameters params) {
+        this.params = params;
+    }
+
     @Override
     @Suspendable
     public SignedTransactionDigest call() {
 
-        Party notary = notaryLookupService.getNotaryIdentities().get(0);
-
         Map<String, String> parametersMap = jsonMarshallingService.parseJson(params.getParametersInJson(), Map.class);
 
-        Party sender = flowIdentity.getOurIdentity();
         String msg;
         CordaX500Name receiverName;
         Party receiver;
+
         if(!parametersMap.containsKey("msg"))
             throw new BadRpcStartFlowRequestException("Template State Parameter \"msg\" missing.");
         else
@@ -81,15 +83,20 @@ public class TemplateFlow implements Flow<SignedTransactionDigest> {
 
         receiver = identityService.partyFromName(receiverName);
 
+        Party notary = notaryLookupService.getNotaryIdentities().get(0);
+
+        Party sender = flowIdentity.getOurIdentity();
+
         TemplateState templateState = new TemplateState(msg, sender, receiver);
+        Command txCommand = new Command(new TemplateContract.Commands.Send(), Arrays.asList(sender.getOwningKey(),
+                receiver.getOwningKey()));
 
         // Stage 1.
         // Generate an unsigned transaction.
         TransactionBuilder transactionBuilder = transactionBuilderFactory.create()
                 .setNotary(notary)
-                .addOutputState(templateState)
-                .addCommand(new TemplateContract.Commands.Send(), Arrays.asList(sender.getOwningKey(),
-                        receiver.getOwningKey()));
+                .addOutputState(templateState, TemplateContract.ID)
+                .addCommand(txCommand);
 
         // Stage 2.
         // Verify that the transaction is valid.
@@ -103,16 +110,23 @@ public class TemplateFlow implements Flow<SignedTransactionDigest> {
         // Send the state to the counterparty, and receive it back with their signature.
         FlowSession receiverSession = flowMessaging.initiateFlow(receiver);
 
-        SignedTransaction fullySignedTx = flowEngine.subFlow(new CollectSignaturesFlow(partialSignedTx,
-                    Arrays.asList(receiverSession)));
+        SignedTransaction fullySignedTx = flowEngine.subFlow(
+                new CollectSignaturesFlow(
+                        partialSignedTx,
+                        Arrays.asList(receiverSession)
+                )
+        );
 
         // Stage 5.
         // Notarise and record the transaction in both parties' vaults
-        SignedTransaction notarisedTx = flowEngine.subFlow(new FinalityFlow(fullySignedTx, Arrays.asList(receiverSession)));
+        SignedTransaction notarisedTx = flowEngine.subFlow(
+                new FinalityFlow(fullySignedTx, Arrays.asList(receiverSession))
+        );
 
         //Step 6.
         // Return Json output
-        return new SignedTransactionDigest(notarisedTx.getId(),
+        return new SignedTransactionDigest(
+                notarisedTx.getId(),
                 Collections.singletonList(jsonMarshallingService.formatJson(notarisedTx.getTx().getOutputStates().get(0))),
                 notarisedTx.getSigs());
     }

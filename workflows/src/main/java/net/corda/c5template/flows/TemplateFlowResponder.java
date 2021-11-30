@@ -14,12 +14,16 @@ import org.jetbrains.annotations.NotNull;
 
 @InitiatedBy(TemplateFlow.class)
 public class TemplateFlowResponder implements Flow<SignedTransaction> {
+
+    private FlowSession counterpartySession;
+
     @CordaInject
     private FlowEngine flowEngine;
-    private FlowSession counterpartySession;
+
     public TemplateFlowResponder(FlowSession counterpartySession) {
         this.counterpartySession = counterpartySession;
     }
+
     @Suspendable
     @Override
     public SignedTransaction call() throws FlowException {
